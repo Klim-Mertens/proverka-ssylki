@@ -1,0 +1,32 @@
+[Unit]
+Description=Проверь ссылку — MAX
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=bots
+Group=bots
+WorkingDirectory=/opt/bots/proverka-ssylki/src
+EnvironmentFile=/opt/bots/proverka-ssylki/.env
+ExecStart=/opt/bots/proverka-ssylki/.venv/bin/python -m proverka_max
+Restart=always
+RestartSec=5
+
+# Песочница: процесс не может получить root, не видит /home, пишет только в свою папку
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/bots/proverka-ssylki
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+CapabilityBoundingSet=
+MemoryMax=300M
+
+[Install]
+WantedBy=multi-user.target
