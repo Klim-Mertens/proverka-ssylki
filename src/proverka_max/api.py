@@ -16,7 +16,7 @@ import urllib.parse
 import urllib.request
 from typing import Any
 
-from proverka_bot.tls import describe_network_error, https_context
+from proverka_bot.tls import describe_network_error, max_context
 
 API_URL = "https://platform-api2.max.ru"
 MAX_MESSAGE_LEN = 4000
@@ -39,7 +39,7 @@ class MaxAPI:
         data = json.dumps(body).encode() if body is not None else None
         request = urllib.request.Request(url, data=data, headers=self._headers, method=method)
         try:
-            with urllib.request.urlopen(request, timeout=timeout or self._timeout, context=https_context()) as resp:  # noqa: S310  # nosec B310
+            with urllib.request.urlopen(request, timeout=timeout or self._timeout, context=max_context()) as resp:  # noqa: S310  # nosec B310
                 raw = resp.read(1_000_000)
         except urllib.error.HTTPError as exc:
             raise MaxError(f"HTTP {exc.code} в {path}") from None

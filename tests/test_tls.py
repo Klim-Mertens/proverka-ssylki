@@ -30,3 +30,10 @@ def test_rate_limiter_is_thread_safe():
     for t in threads: t.start()
     for t in threads: t.join()
     assert sum(allowed) == 50
+
+
+def test_max_context_trusts_russian_ca_and_verifies():
+    from proverka_bot.tls import max_context
+    ctx = max_context()
+    assert ctx.verify_mode == ssl.CERT_REQUIRED and ctx.check_hostname
+    assert "Russian Trusted Root CA" in " ".join(str(c.get("subject")) for c in ctx.get_ca_certs())

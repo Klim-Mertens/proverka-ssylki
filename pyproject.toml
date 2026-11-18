@@ -26,3 +26,4 @@ ignore_missing_imports = true
 
 [tool.setuptools.package-data]
 proverka_bot = ["*.html"]
+proverka_max = ["*.pem"]
