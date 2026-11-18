@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "proverka-ssylki"
+version = "0.1.0"
+description = "«Проверь ссылку»: оценка риска мошенничества в сообщениях (0–100) с объяснениями простым языком"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = []  # ядро без внешних зависимостей
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[[tool.mypy.overrides]]
+module = ["PIL", "PIL.*", "pyzbar", "pyzbar.*"]
+ignore_missing_imports = true
+
+[tool.setuptools.package-data]
+proverka_bot = ["*.html"]

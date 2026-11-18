@@ -1,0 +1,26 @@
+# Секреты: токен Telegram-бота и другие ключи. НИКОГДА не коммитить!
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Редакторы и ОС
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
