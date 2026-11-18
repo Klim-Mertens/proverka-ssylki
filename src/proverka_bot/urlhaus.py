@@ -22,7 +22,6 @@ from __future__ import annotations
 
 import json
 import logging
-import ssl
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -32,6 +31,8 @@ from typing import Any
 from proverka.data import SHORTENERS
 from proverka.extract import FoundUrl
 from proverka.url_rules import USER_CONTENT_DOMAINS
+
+from .tls import https_context
 
 log = logging.getLogger("proverka_bot.urlhaus")
 
@@ -64,7 +65,7 @@ Sender = Callable[[str, bytes, dict[str, str]], bytes]
 
 
 def _default_sender(timeout: float) -> Sender:
-    context = ssl.create_default_context()  # проверка сертификата включена
+    context = https_context()  # проверка сертификата включена (certifi, если есть)
 
     def send(api_url: str, data: bytes, headers: dict[str, str]) -> bytes:
         # api_url — одна из констант выше (https://urlhaus-api.abuse.ch/...),

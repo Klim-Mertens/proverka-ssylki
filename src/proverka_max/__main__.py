@@ -61,7 +61,20 @@ def main() -> int:
             log.info("проверка ссылок по базе URLhaus включена")
         else:
             log.warning("URLHAUS_KEY неправильного вида — проверка по базе выключена")
-    log.info("MAX-бот запущен (polling). Остановить: Ctrl+C")
+    try:
+        me = api.me()
+    except MaxError as exc:
+        if "HTTP 401" in str(exc):
+            print("MAX отклонил токен (401). Скопируйте MAX_TOKEN заново: business.max.ru → Чат-боты → Настройки")
+        else:
+            print("Не удалось подключиться к MAX:", exc)
+        return 1
+    try:
+        if api.subscriptions():
+            log.error("У бота настроен webhook — MAX не отдаёт события через polling. Удалите подписку.")
+    except MaxError:
+        pass
+    log.info("MAX-бот %s запущен (polling). Остановить: Ctrl+C", me.get("username") or me.get("name") or "")
     marker = None
     while True:
         try:

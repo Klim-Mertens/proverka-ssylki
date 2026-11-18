@@ -19,6 +19,8 @@ import urllib.error
 import urllib.request
 from typing import Any
 
+from .tls import https_context
+
 API_HOST = "https://api.telegram.org"
 MAX_MESSAGE_LEN = 4096  # ограничение Telegram на длину одного сообщения
 
@@ -44,7 +46,7 @@ class TelegramAPI:
             url, data=data, headers={"Content-Type": "application/json"}, method="POST"
         )
         try:
-            with urllib.request.urlopen(request, timeout=timeout or self._timeout) as resp:  # noqa: S310  # nosec B310
+            with urllib.request.urlopen(request, timeout=timeout or self._timeout, context=https_context()) as resp:  # noqa: S310  # nosec B310
                 payload = json.loads(resp.read(2_000_000))
         except urllib.error.HTTPError as exc:
             raise TelegramError(f"{method}: HTTP {exc.code}") from None
@@ -105,7 +107,7 @@ class TelegramAPI:
             raise TelegramError("getFile: файл слишком большой")
         url = f"{API_HOST}/file/bot{self._token}/{path}"
         try:
-            with urllib.request.urlopen(url, timeout=self._timeout) as resp:  # noqa: S310  # nosec B310
+            with urllib.request.urlopen(url, timeout=self._timeout, context=https_context()) as resp:  # noqa: S310  # nosec B310
                 data: bytes = resp.read(max_bytes + 1)
         except (urllib.error.URLError, TimeoutError, OSError) as exc:
             raise TelegramError(f"download: {type(exc).__name__}") from None
