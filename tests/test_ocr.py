@@ -72,6 +72,9 @@ class FakeAPI:
     def send_message(self, chat_id, text, reply_markup=None):
         self.sent.append(text)
 
+    def call(self, method, params, timeout=None):
+        self.drafts = getattr(self, "drafts", []) + [(method, params)]
+
     def download_file(self, file_id, max_bytes):
         if self.fail:
             raise TelegramError("download: URLError")
@@ -194,3 +197,21 @@ def test_bright_variant_rejects_bomb_and_garbage():
 def test_ocr_report_shows_recognized_text():
     report = handler.report_for_ocr_text("Срочно сообщите\nкод из смс", OcrJob(1, "f", "", ()))
     assert "«Срочно сообщите код из смс»" in report
+
+
+def test_progress_shown_as_draft_with_fallback():
+    from proverka_bot.handler import OCR_WAIT_TEXT
+    from proverka_bot.server import _show_progress
+
+    api = FakeAPI()
+    _show_progress(api, 5, OCR_WAIT_TEXT)
+    method, params = api.drafts[0]
+    assert method == "sendMessageDraft" and params["draft_id"] > 0 and api.sent == []
+
+    class NoDrafts(FakeAPI):
+        def call(self, method, params, timeout=None):
+            raise TelegramError("sendMessageDraft: HTTP 404")
+
+    api = NoDrafts()
+    _show_progress(api, 5, OCR_WAIT_TEXT)
+    assert api.sent == [OCR_WAIT_TEXT]

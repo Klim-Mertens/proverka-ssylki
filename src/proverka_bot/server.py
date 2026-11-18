@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import hmac
 import json
+import secrets
 import logging
 import sys
 import threading
@@ -55,8 +56,19 @@ def make_reputation(config: Config) -> UrlReputation | None:
     return UrlhausChecker(config.urlhaus_key)
 
 
+def _show_progress(api: TelegramAPI, chat_id: int, text: str) -> None:
+    """«Читаю картинку…» как черновик (sendMessageDraft, Bot API 9.3+): анимированная
+    подсказка исчезает сама, когда придёт отчёт, и не остаётся мусором в чате.
+    Если метод недоступен — обычное сообщение, как раньше."""
+    try:
+        api.call("sendMessageDraft", {"chat_id": chat_id, "draft_id": secrets.randbelow(2**31 - 1) + 1,
+                                      "text": text})
+    except TelegramError:
+        api.send_message(chat_id, text)
+
+
 def _run_ocr(job: OcrJob, api: TelegramAPI, reputation: UrlReputation | None = None) -> None:
-    api.send_message(job.chat_id, OCR_WAIT_TEXT)
+    _show_progress(api, job.chat_id, OCR_WAIT_TEXT)
     try:
         data = api.download_file(job.file_id, ocr.MAX_FILE_BYTES)
         # QR-коды читаем до OCR: даже если текста на картинке нет, ссылка в

@@ -8,6 +8,7 @@
 
 from __future__ import annotations
 
+import threading
 import time
 from collections import OrderedDict, deque
 
@@ -17,9 +18,15 @@ class RateLimiter:
         self.per_minute = per_minute
         self.max_users = max_users
         self._hits: OrderedDict[int, deque[float]] = OrderedDict()
+        # В режиме webhook сообщения обрабатывают два потока одновременно —
+        # без блокировки OrderedDict может испортиться, а лимит обойтись.
+        self._lock = threading.Lock()
 
     def allow(self, user_id: int, now: float | None = None) -> bool:
-        now = time.monotonic() if now is None else now
+        with self._lock:
+            return self._allow(user_id, time.monotonic() if now is None else now)
+
+    def _allow(self, user_id: int, now: float) -> bool:
         hits = self._hits.get(user_id)
         if hits is None:
             hits = self._hits[user_id] = deque()

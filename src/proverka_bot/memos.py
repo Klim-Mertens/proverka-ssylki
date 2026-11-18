@@ -26,7 +26,8 @@ BTN_PHONES = "📞 Куда звонить"
 # компактные, а не на полэкрана.
 MENU: dict[str, Any] = {
     "keyboard": [
-        [{"text": BTN_SOS}],
+        # style (Bot API 9.4): красная кнопка «SOS» заметна сразу. Старые клиенты поле игнорируют.
+        [{"text": BTN_SOS, "style": "danger"}],
         [{"text": BTN_SIGNS}, {"text": BTN_PHONES}],
     ],
     "resize_keyboard": True,

@@ -15,7 +15,7 @@ from proverka_bot.memos import BTN_PHONES, BTN_SIGNS, BTN_SOS
 # Кнопки-памятки: в MAX нет постоянной клавиатуры под полем ввода, поэтому
 # используем inline-кнопки. payload — это текст кнопки, его распознаёт memo_for().
 MENU_BUTTONS: list[list[dict[str, Any]]] = [
-    [{"type": "callback", "text": BTN_SOS, "payload": BTN_SOS}],
+    [{"type": "callback", "text": BTN_SOS, "payload": BTN_SOS, "intent": "negative"}],
     [{"type": "callback", "text": BTN_SIGNS, "payload": BTN_SIGNS},
      {"type": "callback", "text": BTN_PHONES, "payload": BTN_PHONES}],
 ]

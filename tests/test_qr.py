@@ -69,6 +69,9 @@ class FakeAPI:
     def send_message(self, chat_id, text, reply_markup=None):
         self.sent.append(text)
 
+    def call(self, method, params, timeout=None):
+        self.drafts = getattr(self, "drafts", []) + [(method, params)]
+
     def download_file(self, file_id, max_bytes):
         return self.data
 
